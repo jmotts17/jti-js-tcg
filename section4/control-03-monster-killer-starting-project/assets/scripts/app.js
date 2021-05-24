@@ -54,27 +54,45 @@ function healPlayerHandler() {
 }
 
 function printLogHandler() {
-  console.log(battleLog);
+  for (let i = 0; i < 3; i++) {
+    console.log('-----------');
+  }
+
+  // let j = 3;
+  // do {
+  //     console.log(j);
+  //     j++;
+  // } while (j < 3);
+  //   for (let i = 0; i < battleLog.length; i++) {
+  //     console.log(battleLog[i]);
+  //   }
+  let i = 0;
+  for (const log of battleLog) {
+    console.log(`#${i}`);
+    for (const key in log) {
+      console.log(`${key} => ${log[key]}`);
+    }
+    i++;
+  }
+  //   console.log(battleLog);
 }
 
 function attackMonster(mode) {
-  let maxDamage;
-  let logEvent;
-  if (mode === MODE_ATTACK) {
-    maxDamage = ATTACK_VALUE;
-    logEvent = LOG_EVENT_PLAYER_ATTACK;
-  } else if (mode === MODE_STRONG_ATTACK) {
-    maxDamage = STRONG_ATTACK_VALUE;
-    logEvent = LOG_EVENT_PLAYER_STRONG_ATTACK;
-  }
+  const maxDamage = mode === MODE_ATTACK ? ATTACK_VALUE : STRONG_ATTACK_VALUE;
+  const logEvent =
+    mode === MODE_ATTACK
+      ? LOG_EVENT_PLAYER_ATTACK
+      : LOG_EVENT_PLAYER_STRONG_ATTACK;
+  //   if (mode === MODE_ATTACK) {
+  //     maxDamage = ATTACK_VALUE;
+  //     logEvent = LOG_EVENT_PLAYER_ATTACK;
+  //   } else if (mode === MODE_STRONG_ATTACK) {
+  //     maxDamage = STRONG_ATTACK_VALUE;
+  //     logEvent = LOG_EVENT_PLAYER_STRONG_ATTACK;
+  //   }
   const damage = dealMonsterDamage(maxDamage);
   currentMonsterHealth -= damage;
-  writeToLog(
-    logEvent,
-    damage,
-    currentMonsterHealth,
-    currentPlayerHealth
-  );
+  writeToLog(logEvent, damage, currentMonsterHealth, currentPlayerHealth);
   endRound();
 }
 
@@ -100,27 +118,27 @@ function endRound() {
   if (currentMonsterHealth <= 0 && currentPlayerHealth > 0) {
     alert('You won!');
     writeToLog(
-        LOG_EVENT_GAME_OVER,
-        'PLAYER_WON',
-        currentMonsterHealth,
-        currentPlayerHealth
-      );
+      LOG_EVENT_GAME_OVER,
+      'PLAYER_WON',
+      currentMonsterHealth,
+      currentPlayerHealth
+    );
   } else if (currentPlayerHealth <= 0 && currentMonsterHealth > 0) {
     alert('You lost');
     writeToLog(
-        LOG_EVENT_GAME_OVER,
-        'MONSTER_WON',
-        currentMonsterHealth,
-        currentPlayerHealth
-      );
+      LOG_EVENT_GAME_OVER,
+      'MONSTER_WON',
+      currentMonsterHealth,
+      currentPlayerHealth
+    );
   } else if (currentPlayerHealth <= 0 && currentMonsterHealth <= 0) {
     alert('You have a draw');
     writeToLog(
-        LOG_EVENT_GAME_OVER,
-        'DRAW',
-        currentMonsterHealth,
-        currentPlayerHealth
-      );
+      LOG_EVENT_GAME_OVER,
+      'DRAW',
+      currentMonsterHealth,
+      currentPlayerHealth
+    );
   }
 
   if (currentMonsterHealth <= 0 || currentPlayerHealth <= 0) {
@@ -135,40 +153,85 @@ function writeToLog(event, value, monsterHealth, playerHealth) {
     finalMonsterHealth: monsterHealth,
     finalPlayerHealth: playerHealth,
   };
-  if (event === LOG_EVENT_PLAYER_ATTACK) {
-    logEntry.target = 'MONSTER';
-  } else if (event === LOG_EVENT_PLAYER_STRONG_ATTACK) {
-    logEntry = {
-      event: event,
-      value: value,
-      target: 'MONSTER',
-      finalMonsterHealth: monsterHealth,
-      finalPlayerHealth: playerHealth,
-    };
-  } else if (event === LOG_EVENT_MONSTER_ATTACK) {
-    logEntry = {
-      event: event,
-      value: value,
-      target: 'PLAYER',
-      finalMonsterHealth: monsterHealth,
-      finalPlayerHealth: playerHealth,
-    };
-  } else if (event === LOG_EVENT_PLAYER_HEAL) {
-    logEntry = {
-      event: event,
-      value: value,
-      target: 'PLAYER',
-      finalMonsterHealth: monsterHealth,
-      finalPlayerHealth: playerHealth,
-    };
-  } else if (event === LOG_EVENT_GAME_OVER) {
-    logEntry = {
-      event: event,
-      value: value,
-      finalMonsterHealth: monsterHealth,
-      finalPlayerHealth: playerHealth,
-    };
+
+  switch (event) {
+    case LOG_EVENT_PLAYER_ATTACK:
+      logEntry.target = 'MONSTER';
+      break;
+    case LOG_EVENT_PLAYER_STRONG_ATTACK:
+      logEntry = {
+        event: event,
+        value: value,
+        target: 'MONSTER',
+        finalMonsterHealth: monsterHealth,
+        finalPlayerHealth: playerHealth,
+      };
+      break;
+    case LOG_EVENT_MONSTER_ATTACK:
+      logEntry = {
+        event: event,
+        value: value,
+        target: 'PLAYER',
+        finalMonsterHealth: monsterHealth,
+        finalPlayerHealth: playerHealth,
+      };
+      break;
+    case LOG_EVENT_PLAYER_HEAL:
+      logEntry = {
+        event: event,
+        value: value,
+        target: 'PLAYER',
+        finalMonsterHealth: monsterHealth,
+        finalPlayerHealth: playerHealth,
+      };
+      break;
+    case LOG_EVENT_GAME_OVER:
+      logEntry = {
+        event: event,
+        value: value,
+        finalMonsterHealth: monsterHealth,
+        finalPlayerHealth: playerHealth,
+      };
+      break;
+    default:
+      logEntry = {};
   }
+
+  //   if (event === LOG_EVENT_PLAYER_ATTACK) {
+  //     logEntry.target = 'MONSTER';
+  //   } else if (event === LOG_EVENT_PLAYER_STRONG_ATTACK) {
+  //     logEntry = {
+  //       event: event,
+  //       value: value,
+  //       target: 'MONSTER',
+  //       finalMonsterHealth: monsterHealth,
+  //       finalPlayerHealth: playerHealth,
+  //     };
+  //   } else if (event === LOG_EVENT_MONSTER_ATTACK) {
+  //     logEntry = {
+  //       event: event,
+  //       value: value,
+  //       target: 'PLAYER',
+  //       finalMonsterHealth: monsterHealth,
+  //       finalPlayerHealth: playerHealth,
+  //     };
+  //   } else if (event === LOG_EVENT_PLAYER_HEAL) {
+  //     logEntry = {
+  //       event: event,
+  //       value: value,
+  //       target: 'PLAYER',
+  //       finalMonsterHealth: monsterHealth,
+  //       finalPlayerHealth: playerHealth,
+  //     };
+  //   } else if (event === LOG_EVENT_GAME_OVER) {
+  //     logEntry = {
+  //       event: event,
+  //       value: value,
+  //       finalMonsterHealth: monsterHealth,
+  //       finalPlayerHealth: playerHealth,
+  //     };
+  //   }
+
   battleLog.push(logEntry);
 }
 
